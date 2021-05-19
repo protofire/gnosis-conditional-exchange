@@ -55,7 +55,7 @@ export const TRADING_FEE_OPTIONS = [
 
 export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
-export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kadenzipfel/omen-rinkeby' // TODO: change back 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_SOKOL_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_SOKOL_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
@@ -127,3 +127,4 @@ export const RELAY_FEE = '1000000000000000' // 0.001 xdai
 export const RELAY_ADDRESS = '0x1B50BC65403333F921fE627eda28C119a93AA15F'
 
 export const STANDARD_DECIMALS = 18
+export const YEAR_IN_SECONDS = 31536000

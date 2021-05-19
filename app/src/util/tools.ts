@@ -11,6 +11,7 @@ import {
   SOKOL_NETWORKS,
   STANDARD_DECIMALS,
   XDAI_NETWORKS,
+  YEAR_IN_SECONDS,
 } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { CompoundService } from '../services/compound_service'
@@ -773,4 +774,32 @@ export const getInitialCollateral = (networkId: number, collateral: Token, relay
 export const reverseArray = (array: any[]): any[] => {
   const newArray = array.map((e, i, a) => a[a.length - 1 - i])
   return newArray
+}
+
+export const getRemainingRewards = (
+  rewardsAmount: BigNumber,
+  timeRemaining: number,
+  duration: number,
+  decimals: number,
+): BigNumber => {
+  const durationFraction = timeRemaining / duration
+  const rewardsAmountNumber = Number(formatBigNumber(rewardsAmount, decimals, decimals))
+  return parseUnits((rewardsAmountNumber * durationFraction).toString(), decimals)
+}
+
+export const calculateRewardApr = (
+  totalStakedTokens: number,
+  timeRemaining: number,
+  remainingRewards: number,
+  stakedTokenPrice: number,
+  rewardTokenPrice: number,
+): number => {
+  if (remainingRewards <= 0) {
+    return 0
+  }
+  const timeMultiple = YEAR_IN_SECONDS / timeRemaining
+  const tokensPerYear = timeMultiple * remainingRewards
+  const usdPerYear = tokensPerYear * rewardTokenPrice
+  const stakedUsd = totalStakedTokens * stakedTokenPrice
+  return (usdPerYear / stakedUsd) * 100
 }

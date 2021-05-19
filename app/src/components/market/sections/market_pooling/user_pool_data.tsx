@@ -14,7 +14,7 @@ const UserDataTitleValue = styled(TitleValue)`
   &:nth-child(odd) {
     margin-right: 32px;
   }
-  &:nth-child(-n + 2) {
+  &:nth-child(-n + 6) {
     margin-bottom: 12px;
   }
 
@@ -59,10 +59,24 @@ interface Props {
   symbol: string
   userEarnings: BigNumber
   totalEarnings: BigNumber
+  currentApr: number
+  remainingRewards: number
+  earnedRewards: number
+  totalRewards: number
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
-  const { collateral, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const {
+    collateral,
+    currentApr,
+    earnedRewards,
+    remainingRewards,
+    totalEarnings,
+    totalPoolShares,
+    totalRewards,
+    totalUserLiquidity,
+    userEarnings,
+  } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
   const baseCollateral = getInitialCollateral(networkId, collateral)
@@ -104,6 +118,26 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
           formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
         )} ${baseCollateral.symbol}`}
+      />
+      <UserDataTitleValue
+        state={currentApr > 0 ? ValueStates.success : undefined}
+        title="Current APR"
+        value={`${formatNumber(currentApr.toString())}%`}
+      />
+      <UserDataTitleValue
+        state={remainingRewards > 0 ? ValueStates.success : undefined}
+        title="Total Rewards left"
+        value={`${formatNumber(remainingRewards.toString())} OMN`}
+      />
+      <UserDataTitleValue
+        state={earnedRewards > 0 ? ValueStates.success : undefined}
+        title="Your Rewards"
+        value={`${formatNumber(earnedRewards.toString())} OMN`}
+      />
+      <UserDataTitleValue
+        state={totalRewards > 0 ? ValueStates.success : undefined}
+        title="Total Rewards"
+        value={`${formatNumber(totalRewards.toString())} OMN`}
       />
     </UserData>
   )

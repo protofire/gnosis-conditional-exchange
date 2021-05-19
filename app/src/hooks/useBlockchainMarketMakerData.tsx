@@ -141,10 +141,15 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
     })
 
-    const userEarnings =
-      cpk && cpk.address && marketMakerFunding.gt(0)
-        ? await marketMaker.getFeesWithdrawableBy(cpk.address)
-        : new BigNumber(0)
+    let userEarnings = new BigNumber(0)
+
+    if (cpk && cpk.address && marketMakerFunding.gt(0)) {
+      try {
+        userEarnings = await marketMaker.getFeesWithdrawableBy(cpk.address)
+      } catch {
+        console.warn('Could not retrieve user earnings.')
+      }
+    }
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
 

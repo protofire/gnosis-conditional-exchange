@@ -70,7 +70,7 @@ const query = gql`
   }
 `
 
-type GraphResponseFixedProductMarketMaker = {
+export type GraphResponseFixedProductMarketMaker = {
   id: string
   answerFinalizedTimestamp: Maybe<string>
   arbitrator: string
@@ -186,7 +186,10 @@ const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] =
   return bondedItems
 }
 
-const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
+export const wrangleMarketDataResponse = (
+  data: GraphResponseFixedProductMarketMaker,
+  networkId: number,
+): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
 
   return {
@@ -248,7 +251,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   useEffect(() => {
     if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
-      const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+      const rangledValue = wrangleMarketDataResponse(data.fixedProductMarketMaker, networkId)
       setMarketMakerData(rangledValue)
     }
     // eslint-disable-next-line

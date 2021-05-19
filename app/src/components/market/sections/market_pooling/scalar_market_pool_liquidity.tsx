@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import { BigNumber, bigNumberify } from 'ethers/utils'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -16,8 +16,11 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useGraphLiquidityMiningCampaigns,
   useSymbol,
 } from '../../../../hooks'
+import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import {
   getNativeAsset,
@@ -72,6 +75,11 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   margin: 0 -24px;
   padding: 20px 24px 0;
+`
+
+const BottomButtonRight = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const WarningMessageStyled = styled(WarningMessage)`
@@ -155,8 +163,16 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [rewardApr, setRewardApr] = useState(0)
+  const [remainingRewards, setRemainingRewards] = useState(0)
+  const [earnedRewards, setEarnedRewards] = useState(0)
+  const [totalRewards, setTotalRewards] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
+
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   let baseCollateral = collateral
@@ -251,12 +267,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       if (!cpk) {
         return
       }
-
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-
-      if (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) {
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
@@ -266,12 +285,17 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       }
       let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
-        fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          amountToFundNormalized || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
 
       setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
@@ -294,10 +318,86 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${formatNumber(fundsAmount)}  ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const addFundingAndStake = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
+      }
+
+      setMessage(
+        `Depositing funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }...`,
+      )
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.depositAndStake({
+        amount: amountToFundNormalized || Zero,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateral,
+        compoundService,
+        holdingsBN: balances.map(b => b.holdings),
+        marketMaker,
+        poolShareSupply: totalPoolShares,
+        setTxHash,
+        setTxState,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
+      setMessage(
+        `Successfully deposited ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }`,
+      )
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to deposit funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const deposit = async () => {
+    if (liquidityMiningCampaign) {
+      addFundingAndStake()
+    } else {
+      addFunding()
     }
   }
 
@@ -307,9 +407,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         return
       }
 
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionModalOpen(true)
-      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
       if (
         compoundService &&
         collateralSymbol in CompoundTokenType &&
@@ -319,7 +417,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           baseCollateral,
           depositedTokensTotal,
         )
-        fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          displayDepositedTokensTotal || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
 
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
@@ -334,6 +436,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           useBaseToken = true
         }
       }
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -359,12 +464,156 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
+
+  const unstakeClaimAndRemoveFunding = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.unstakeClaimAndWithdraw({
+        amountToMerge: depositedTokens,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        compoundService,
+        earnings: userEarnings,
+        marketMaker,
+        outcomesCount: balances.length,
+        setTxHash,
+        setTxState,
+        sharesToBurn: amountToRemove || Zero,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
+      setAmountToRemoveNormalized(null)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to withdraw funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const withdraw = () => {
+    if (liquidityMiningCampaign) {
+      unstakeClaimAndRemoveFunding()
+    } else {
+      removeFunding()
+    }
+  }
+
+  const claim = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+
+      setMessage(`Claiming OMN rewards...`)
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.claimRewardTokens(liquidityMiningCampaign.id, setTxHash, setTxState)
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setMessage(`Successfully claimed OMN rewards`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to claim OMN rewards.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
+
+  useEffect(() => {
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === marketMakerAddress
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
+    }
+  }, [liquidityMiningCampaigns, marketMakerAddress])
+
+  const fetchStakingData = async () => {
+    if (!liquidityMiningCampaign) {
+      throw new Error('No liquidity mining campaign')
+    }
+    if (!cpk) {
+      throw new Error('No cpk')
+    }
+
+    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
+      getToken(networkId, 'omn'),
+      cpk.address,
+      1, // Assume pool token value is 1 DAI
+      // TODO: Replace hardcoded price param
+      1,
+      Number(liquidityMiningCampaign.endsAt),
+      liquidityMiningCampaign.rewardAmounts[0],
+      Number(liquidityMiningCampaign.duration),
+    )
+    const userStakedTokens = await stakingService?.getStakedTokensOfAmount(cpk.address)
+
+    setUserStakedTokens(bigNumberify(userStakedTokens || 0))
+    setEarnedRewards(earnedRewards)
+    setRemainingRewards(remainingRewards)
+    setRewardApr(rewardApr)
+    setTotalRewards(totalRewards)
+  }
+
+  useEffect(() => {
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk?.address, liquidityMiningCampaign, cpk, fetchStakingData])
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -376,14 +625,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const collateralAmountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${displayCollateral.symbol}`
-      : null
+  const collateralAmountError = isTransactionProcessing
+    ? null
+    : maybeCollateralBalance === null
+    ? null
+    : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
+    ? `Insufficient balance`
+    : amountToFund?.gt(maybeCollateralBalance)
+    ? `Value must be less than or equal to ${walletBalance} ${displayCollateral.symbol}`
+    : null
 
   const disableDepositButton =
     !amountToFund ||
@@ -515,8 +765,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   let sellNoteDepositedTokensTotal = depositedTokensTotal
   let displayUserEarnings = userEarnings
   let displayPoolTokens = poolTokens
-  let displayFundingBalance = fundingBalance
-  let displaySharesBalance = sharesBalance
+  let displayFundingBalance = userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance
+  let displaySharesBalance =
+    userStakedTokens && userStakedTokens.gt(0) ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
   // Set display values if the collateral is cToken type
   if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
@@ -537,14 +788,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
-  const sharesAmountError =
-    maybeFundingBalance === null
-      ? null
-      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-      ? `Insufficient balance`
-      : amountToRemove?.gt(maybeFundingBalance)
-      ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
-      : null
+  const sharesAmountError = isTransactionProcessing
+    ? null
+    : maybeFundingBalance === null
+    ? null
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
+    ? `Insufficient balance`
+    : amountToRemoveNormalized?.gt(displayFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+    : null
 
   const disableWithdrawButton =
     !amountToRemove ||
@@ -557,9 +809,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     <>
       <UserPoolData
         collateral={collateral}
+        currentApr={rewardApr}
+        earnedRewards={earnedRewards}
+        remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}
+        totalRewards={totalRewards}
         totalUserLiquidity={totalUserLiquidity}
         userEarnings={userEarnings}
       />
@@ -640,7 +896,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
+              <TokenBalance
+                text={`${userStakedTokens.gt(0) ? 'Staked' : 'Pool'} Tokens`}
+                value={
+                  userStakedTokens.gt(0)
+                    ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS)
+                    : formatNumber(displaySharesBalance)
+                }
+              />
 
               <TextfieldCustomPlaceholder
                 formField={
@@ -657,7 +920,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                   />
                 }
                 onClickMaxButton={() => {
-                  setAmountToRemove(fundingBalance)
+                  setAmountToRemove(userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance)
                   setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
@@ -769,16 +1032,28 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Cancel
         </Button>
-        {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
-            Deposit
-          </Button>
-        )}
-        {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={removeFunding}>
-            Withdraw
-          </Button>
-        )}
+        <BottomButtonRight>
+          {liquidityMiningCampaign && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!(userStakedTokens && userStakedTokens.gt(0) && earnedRewards > 0)}
+              onClick={() => claim()}
+              style={{ marginRight: 12 }}
+            >
+              Claim Rewards
+            </Button>
+          )}
+          {activeTab === Tabs.deposit && (
+            <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={deposit}>
+              Deposit
+            </Button>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={withdraw}>
+              Withdraw
+            </Button>
+          )}
+        </BottomButtonRight>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}

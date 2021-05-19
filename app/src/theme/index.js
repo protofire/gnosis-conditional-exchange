@@ -91,6 +91,7 @@ const theme = {
     error: '#fa0000',
     gray: '#b7b7b7',
     green: '#4B9E98',
+    darkGreen: '#4B948F',
     greenLight: '#60D099',
     mainBodyBackground: '#fff',
     primary: '#3F51B5',

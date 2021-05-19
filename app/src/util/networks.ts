@@ -78,6 +78,7 @@ interface Network {
   defaultToken?: string
   blockExplorer: string
   blockExplorerURL: string
+  OMN?: Token
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -334,6 +335,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
       [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.RINKEBY]: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
     },
     order: 22,
   },

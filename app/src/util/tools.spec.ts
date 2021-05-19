@@ -16,6 +16,7 @@ import {
   calcPrice,
   calcSellAmountInCollateral,
   calcXValue,
+  calculateRewardApr,
   calculateSharesBought,
   clampBigNumber,
   computeBalanceAfterTrade,
@@ -30,6 +31,7 @@ import {
   getIndexSets,
   getInitialCollateral,
   getNetworkFromChain,
+  getRemainingRewards,
   getScalarTitle,
   getUnit,
   isDust,
@@ -755,6 +757,40 @@ describe('tools', () => {
     for (const [array, result] of testCases) {
       const reversedArray = reverseArray(array)
       expect(result).toStrictEqual(reversedArray)
+    }
+  })
+
+  describe('getRemainingRewards', () => {
+    const testCases: [[BigNumber, number, number, number], BigNumber][] = [
+      [[parseUnits('1', 18), 1000, 10000, 18], parseUnits('1', 17)],
+      [[parseUnits('5', 8), 2000, 50000, 8], parseUnits('2', 7)],
+      [[parseUnits('5', 18), 5000, 5000, 18], parseUnits('5', 18)],
+      [[parseUnits('5', 18), 0, 5000, 18], new BigNumber(0)],
+    ]
+    for (const [[rewardsAmount, timeRemaining, duration, decimals], result] of testCases) {
+      const remainingRewards = getRemainingRewards(rewardsAmount, timeRemaining, duration, decimals)
+      expect(result).toStrictEqual(remainingRewards)
+    }
+  })
+
+  describe('calculateRewardApr', () => {
+    const testCases: [[number, number, number, number, number], number][] = [
+      [[10, 1000, 100, 1, 1], 31536000],
+      [[10, 200000, 10, 1, 1], 15768],
+      [[10, 200000, 10, 3.4, 5.8], 26898.352941176472],
+    ]
+    for (const [
+      [totalStakedTokens, timeRemaining, remainingRewards, stakedTokenPrice, rewardTokenPrice],
+      result,
+    ] of testCases) {
+      const rewardApr = calculateRewardApr(
+        totalStakedTokens,
+        timeRemaining,
+        remainingRewards,
+        stakedTokenPrice,
+        rewardTokenPrice,
+      )
+      expect(result).toStrictEqual(rewardApr)
     }
   })
 })
