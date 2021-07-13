@@ -2,12 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { XdaiService } from '../services'
 import { getToken, networkIds } from '../util/networks'
 import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 interface Prop {
   transactionHash: string

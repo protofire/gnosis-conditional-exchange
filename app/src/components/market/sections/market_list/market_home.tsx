@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { ConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { getLogger } from '../../../../util/logger'
 import { networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'

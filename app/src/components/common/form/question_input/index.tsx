@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
 import { Textfield } from '../..'
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { ConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { FormLabel } from '../form_label'
 
 interface Props {

@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
 import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'

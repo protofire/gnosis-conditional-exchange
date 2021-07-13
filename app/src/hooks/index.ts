@@ -1,4 +1,4 @@
-export * from './connectedWeb3'
+export * from '../contexts/connectedWeb3'
 export * from './useBalance'
 export { use24hsVolume } from './use24hsVolume'
 export { useAsyncDerivedValue } from './useAsyncDerivedValue'

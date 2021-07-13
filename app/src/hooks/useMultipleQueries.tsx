@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { getGraphUris } from '../util/networks'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 type GraphVariables = { [key: string]: string }
 const fetchQuery = (query: string, variables: GraphVariables, endpoint: string) => {

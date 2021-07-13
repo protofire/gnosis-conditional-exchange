@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { MarketMakerData } from '../../../../util/types'
 
 import { MarketView } from './market_view'

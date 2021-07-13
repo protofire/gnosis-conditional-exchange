@@ -1,4 +1,5 @@
-import { useConnectedWeb3Context } from './connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+
 import { useBlockchainMarketMakerData } from './useBlockchainMarketMakerData'
 import { useGraphMarketMakerData } from './useGraphMarketMakerData'
 

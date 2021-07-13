@@ -2,16 +2,15 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { ConnectedBalance, useBalance } from '../hooks/useBalance'
+import { useCpk } from '../hooks/useCpk'
+import { useSafeApp } from '../hooks/useSafeApp'
 import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
-
-import { ConnectedBalance, useBalance } from './useBalance'
-import { useCpk } from './useCpk'
-import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 

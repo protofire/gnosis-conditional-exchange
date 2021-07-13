@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { getLogger } from '../util/logger'
 import { waitForBlockToSync } from '../util/networks'
 import { KlerosCurationData, MarketMakerData, Status } from '../util/types'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
 const logger = getLogger('KlerosCuration')

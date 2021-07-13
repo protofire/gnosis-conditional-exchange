@@ -2,7 +2,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 
 import { DOCUMENT_TITLE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { isScalarMarket } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'

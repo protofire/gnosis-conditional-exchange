@@ -3,9 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { getLogger } from '../util/logger'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 const logger = getLogger('Market::use24hsVolume')
 

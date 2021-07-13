@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { ERC20Service } from '../services'
 import { getTokenFromAddress } from '../util/networks'
 import { Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 const getTokenFromAddressIfExists = (networkId: number, collateralAddress: string): Maybe<Token> => {
   try {

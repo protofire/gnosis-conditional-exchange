@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { RemoteData } from '../util/remote_data'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 /**
  * Return details about a user's proxy contract

@@ -1,11 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { ERC20Service } from '../services'
 import { pseudoNativeAssetAddress } from '../util/networks'
 import { Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const fetchBalance = async (collateral: Token, context: ConnectedWeb3Context) => {
   const { account, library: provider } = context

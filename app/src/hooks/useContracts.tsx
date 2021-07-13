@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import { IPFS_GATEWAY } from '../common/constants'
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import {
   ConditionalTokenService,
   DxTCRService,
@@ -11,8 +12,6 @@ import {
   RealitioService,
 } from '../services'
 import { getContractAddress } from '../util/networks'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { account, library: provider, networkId } = context

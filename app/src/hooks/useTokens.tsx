@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import {
   getGraphUris,
   getInfuraUrl,
@@ -16,8 +17,6 @@ import {
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 const query = `
   query GetTokenList($listId: String!) {

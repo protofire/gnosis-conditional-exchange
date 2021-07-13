@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+
 import { useContracts } from './useContracts'
 
 export const useFundingBalance = (

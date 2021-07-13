@@ -1,7 +1,6 @@
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { getNativeAsset, getWrapToken } from '../util/networks'
 import { Token } from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 export const useSymbol = (token: Token) => {
   const { networkId, relay } = useConnectedWeb3Context()

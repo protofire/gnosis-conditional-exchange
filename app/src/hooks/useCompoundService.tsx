@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { CompoundService } from '../services'
 import { CompoundTokenType, Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useCompoundService = (
   collateral: Token | null,

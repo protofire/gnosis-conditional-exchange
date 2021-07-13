@@ -1,10 +1,9 @@
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { getInfuraUrl, networkIds } from '../util/networks'
 import { isContract } from '../util/tools'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useCheckContractExists = (marketMakerAddress: string, context: ConnectedWeb3Context): boolean => {
   const [contractExists, setContractExists] = useState<boolean>(true)
