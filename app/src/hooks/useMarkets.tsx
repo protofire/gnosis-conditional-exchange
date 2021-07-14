@@ -22,6 +22,7 @@ interface MarketVariables {
   fee: string
   now: number
   knownArbitrators: string[]
+  knownOracles: string[]
 }
 
 type Options = MarketVariables & MarketFilters

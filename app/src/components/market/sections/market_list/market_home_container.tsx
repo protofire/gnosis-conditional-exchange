@@ -13,7 +13,7 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
-import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getContractAddress, getOutcomes, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
@@ -241,6 +241,9 @@ const MarketHomeContainer: React.FC = () => {
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+  const realitioScalarAdapterAddress = getContractAddress(context.networkId, 'realitioScalarAdapter')
+  const oracleAddress = getContractAddress(context.networkId, 'oracle')
+  const knownOracles = [oracleAddress, realitioScalarAdapterAddress]
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
@@ -251,6 +254,7 @@ const MarketHomeContainer: React.FC = () => {
     fee: feeBN.toString(),
     now: +now,
     knownArbitrators,
+    knownOracles,
     ...filter,
   }
 

@@ -56,6 +56,7 @@ export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) =
     sortBy === 'openingTimestamp' ? 'openingTimestamp_gt: $now' : '',
     category === 'All' ? '' : 'category: $category',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
+    'oracle_in: $knownOracles',
     currency ? 'collateralToken: $currency' : '',
     title ? 'title_contains: $title' : '',
   ]
@@ -107,6 +108,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
+    'oracle_in: $knownOracles',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "1", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
@@ -124,7 +126,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $knownOracles: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }
