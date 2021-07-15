@@ -35,7 +35,7 @@ export const ThreeboxStylesOverride = css`
 
       /* Comment */
       .comment {
-        border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+        border-bottom: 1px solid ${props => props.theme.primary4};
         padding: 15px 8px;
 
         &:first-child {

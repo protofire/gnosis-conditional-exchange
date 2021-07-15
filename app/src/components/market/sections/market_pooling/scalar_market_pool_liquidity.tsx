@@ -590,12 +590,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           Back
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={addFunding}>
             Deposit
           </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={removeFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableWithdrawButton} onClick={removeFunding}>
             Withdraw
           </Button>
         )}

@@ -1,3 +1,36 @@
+import React from 'react'
+import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components'
+
+import { Colors } from './types'
+
+export function colors(darkMode: boolean): Colors {
+  return {
+    //figma link https://www.figma.com/file/zVniQrYgkj8AfQs5zNeBrS/Components-FINAL
+
+    // text
+    text1: darkMode ? '' : '#37474F',
+    text2: darkMode ? '' : '#86909E',
+    text3: darkMode ? '' : '#333333',
+    text4: darkMode ? '' : '#757575',
+
+    //primary colors
+    primary1: darkMode ? '' : '#5C6BC0',
+    primary2: darkMode ? '' : '#7986CB',
+    primary3: darkMode ? '' : '#3F51B5',
+    primary4: darkMode ? '' : '#E8EAF6',
+
+    //other
+    white: darkMode ? '' : '#fff',
+    green: darkMode ? '' : '#4B9E98',
+    red: darkMode ? '' : '#E57373',
+    link: darkMode ? '' : '#1E88E5',
+
+    //border
+    border1: darkMode ? '' : '#DCDFF2',
+    border2: darkMode ? '' : '#C5CAE9',
+    border3: darkMode ? '' : '#9FA8DA',
+  }
+}
 const theme = {
   fonts: {
     defaultSize: '14px',
@@ -456,5 +489,62 @@ const theme = {
     positionBall: '#B2DFDB',
   },
 }
-
 export default theme
+
+/* BElLOW IS ALTERNATIVE WAY TO DO MEDIA QUERIES */
+
+// export const MEDIA_WIDTHS = {
+//   upToExtraSmall: 500,
+//   upToSmall: 720,
+//   upToMedium: 960,
+//   upToLarge: 1280,
+// }
+//
+// const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } = Object.keys(MEDIA_WIDTHS).reduce(
+//   (accumulator, size) => {
+//     ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
+//       @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+//         ${css(a, b, c)};
+//       }
+//     `
+//     return accumulator
+//   },
+//   {},
+// ) as any
+
+function themeAggregator(darkMode: boolean) {
+  return {
+    ...theme,
+    ...colors(darkMode),
+  }
+}
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  //this is temporary until we determine to use dark theme
+  const darkMode = false
+
+  return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
+}
+
+const TextWrapper = styled.div<{ color: keyof Colors }>`
+  color: ${props => props.theme.text3};
+  font-family: Roboto;
+  letter-spacing: 0.2px;
+`
+
+export const TYPE = {
+  heading1(props: any) {
+    return <TextWrapper fontSize={'22px'} fontWeight={500} letterSpacing={'0.8px'} lineHeight={'26px'} {...props} />
+  },
+  heading2(props: any) {
+    return <TextWrapper fontSize={'18px'} fontWeight={400} lineHeight={'21px'} {...props} />
+  },
+  heading3(props: any) {
+    return <TextWrapper fontSize={'16px'} fontWeight={500} lineHeight={'19px'} {...props} />
+  },
+  bodyMedium(props: any) {
+    return <TextWrapper fontSize={'14px'} fontWeight={500} lineHeight={'18px'} {...props} />
+  },
+  bodyRegular(props: any) {
+    return <TextWrapper fontSize={'14px'} fontWeight={400} lineHeight={'18px'} {...props} />
+  },
+}

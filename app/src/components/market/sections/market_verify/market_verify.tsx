@@ -129,7 +129,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Back
         </Button>
-        <Button buttonType={ButtonType.primaryAlternative} disabled={verificationBtnDisabled} onClick={onSubmitMarket}>
+        <Button buttonType={ButtonType.primary} disabled={verificationBtnDisabled} onClick={onSubmitMarket}>
           Request Verification
         </Button>
       </BottomButtonWrapper>

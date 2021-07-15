@@ -6,7 +6,6 @@ export enum ButtonType {
   primaryLine,
   secondary,
   secondaryLine,
-  primaryAlternative,
 }
 
 export interface ButtonCommonProps {
@@ -20,108 +19,89 @@ export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement>
 
 const PrimaryCSS = css`
   & {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColor};
-    border-color: ${props => props.theme.buttonPrimary.borderColor};
-    color: ${props => props.theme.buttonPrimary.color};
+    background-color: ${props => props.theme.primary1};
+    border-color: ${props => props.theme.primary1};
+    color: ${props => props.theme.white};
   }
 
   &:hover {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColorHover};
-    border-color: ${props => props.theme.buttonPrimary.borderColorHover};
-    color: ${props => props.theme.buttonPrimary.colorHover};
+    background-color: ${props => props.theme.primary3};
+    border-color: ${props => props.theme.primary3};
+    color: ${props => props.theme.white};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonPrimary.borderColorDisabled};
-    color: ${props => props.theme.buttonPrimary.colorDisabled};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.text2};
     cursor: not-allowed;
-    opacity: 0.5;
   }
 `
 
 const PrimaryLineCSS = css`
   & {
-    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColor};
-    color: ${props => props.theme.buttonPrimaryLine.color};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.border1};
+    color: ${props => props.theme.text1};
   }
 
   &:hover {
-    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColorHover};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColorHover};
-    color: ${props => props.theme.buttonPrimaryLine.colorHover};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.border2};
+    color: ${props => props.theme.text1};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
-    color: ${props => props.theme.buttonPrimaryLine.colorDisabled};
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
-
-const PrimaryAlternativeCSS = css`
-  & {
-    border: 1px solid ${props => props.theme.buttonPrimary.borderColorHover};
-    background-color: ${props => props.theme.buttonPrimary.backgroundColor};
-    color: ${props => props.theme.buttonPrimary.color};
-  }
-
-  &[disabled],
-  &[disabled]:hover {
-    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
-    color: ${props => props.theme.colors.textColorLighter};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.text1};
     cursor: not-allowed;
   }
 `
 
 const SecondaryCSS = css`
   & {
-    background-color: ${props => props.theme.buttonSecondary.backgroundColor};
-    border-color: ${props => props.theme.buttonSecondary.borderColor};
-    color: ${props => props.theme.buttonSecondary.color};
+    background-color: ${props => props.theme.primary4};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.primary3};
     font-weight: ${props => props.theme.buttonSecondary.weight};
   }
 
   &:hover {
-    background-color: ${props => props.theme.buttonSecondary.backgroundColorHover};
-    border-color: ${props => props.theme.buttonSecondary.borderColorHover};
-    color: ${props => props.theme.buttonSecondary.colorHover};
+    background-color: ${props => props.theme.primary4};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.primary3};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props => props.theme.buttonSecondary.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonSecondary.borderColorDisabled};
-    color: ${props => props.theme.buttonSecondary.colorDisabled};
+    background-color: ${props => props.theme.primary4};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.primary3};
     cursor: not-allowed;
-    opacity: 0.5;
   }
 `
 
 const SecondaryLineCSS = css`
   & {
-    background-color: ${props => props.theme.buttonSecondaryLine.backgroundColor};
-    border-color: ${props => props.theme.buttonSecondaryLine.borderColor};
-    color: ${props => props.theme.buttonSecondaryLine.color};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.border1};
+    color: ${props => props.theme.text1};
   }
 
   &:hover {
-    background-color: ${props => props.theme.buttonSecondaryLine.backgroundColorHover};
-    border-color: ${props => props.theme.buttonSecondaryLine.borderColorHover};
-    color: ${props => props.theme.buttonSecondaryLine.colorHover};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.border2};
+    color: ${props => props.theme.text1};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props => props.theme.buttonSecondaryLine.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonSecondaryLine.borderColorDisabled};
-    color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.border1};
+    color: ${props => props.theme.text1};
     cursor: not-allowed;
   }
 `
@@ -141,10 +121,6 @@ const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primaryLine): a
 
   if (buttonType === ButtonType.secondaryLine) {
     return SecondaryLineCSS
-  }
-
-  if (buttonType === ButtonType.primaryAlternative) {
-    return PrimaryAlternativeCSS
   }
 
   return PrimaryCSS

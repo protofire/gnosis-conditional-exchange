@@ -419,7 +419,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}
 
             <DepositWithdrawButton
-              buttonType={ButtonType.primaryAlternative}
+              buttonType={ButtonType.primary}
               disabled={isDepositWithdrawDisabled}
               onClick={depositWithdraw}
             >
