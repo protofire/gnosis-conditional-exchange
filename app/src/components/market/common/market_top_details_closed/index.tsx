@@ -5,9 +5,9 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { CompoundService } from '../../../../services'
-import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
@@ -42,6 +42,7 @@ interface Props {
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const theme = useTheme()
   const { networkId, relay } = context
   const { compoundService, marketMakerData } = props
   const history = useHistory()

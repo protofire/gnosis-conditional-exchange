@@ -21,4 +21,5 @@ export interface Colors {
   border1: Color
   border2: Color
   border3: Color
+  border4: Color
 }

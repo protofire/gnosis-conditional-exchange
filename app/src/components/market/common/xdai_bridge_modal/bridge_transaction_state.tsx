@@ -3,7 +3,6 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
-import theme from '../../../../theme'
 import { getTxHashBlockExplorerURL, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { TransactionStep } from '../../../../util/types'
@@ -31,7 +30,7 @@ const SvgWrapper = styled.div`
   margin-bottom: 25px;
 `
 const BoldedText = styled.div`
-  color: ${({ theme }) => theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-family: Roboto;
   font-weight: 500;
   font-size: 14px;
@@ -41,17 +40,20 @@ const CloseButton = styled(ButtonRound)`
   width: 100%;
   margin-top: 20px;
 `
-
 const ChainText = styled.div`
   margin-top: 8px;
   margin-bottom: 16px;
 `
 const TransactionText = styled.div`
-  color: ${({ theme }) => theme.colors.textColor};
+  color: ${props => props.theme.text4};
 `
 const TransactionLink = styled.a`
-  color: ${({ theme }) => theme.colors.clickable};
+  color: ${props => props.theme.primary2};
 `
+const IconWrapper = styled.div`
+  color: ${props => props.theme.green};
+`
+
 export const TransactionState = ({
   amountToTransfer,
   fetchBalance,
@@ -76,7 +78,9 @@ export const TransactionState = ({
         ) : state === TransactionStep.transactionSubmitted ? (
           <IconArrowUp />
         ) : (
-          <IconArrowUp color={theme.colors.green} />
+          <IconWrapper>
+            <IconArrowUp />
+          </IconWrapper>
         )}
       </SvgWrapper>
 

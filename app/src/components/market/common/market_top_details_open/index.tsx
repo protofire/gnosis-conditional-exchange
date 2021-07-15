@@ -5,8 +5,8 @@ import styled from 'styled-components'
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
-import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
@@ -43,6 +43,7 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const theme = useTheme()
   const { networkId, relay } = context
   const { width } = useWindowDimensions()
   const isMobile = width <= parseInt(theme.themeBreakPoints.sm)

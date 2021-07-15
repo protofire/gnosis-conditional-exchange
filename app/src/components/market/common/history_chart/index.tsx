@@ -4,7 +4,6 @@ import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
-import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
@@ -29,7 +28,7 @@ const ChartTooltip = styled.div`
 `
 
 const TooltipTitle = styled.h4`
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
@@ -49,7 +48,7 @@ const ButtonWrapper = styled.div`
 
 const Legend = styled.li`
   align-items: center;
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.text4};
   display: flex;
   font-size: 12px;
   font-weight: 400;
@@ -58,14 +57,14 @@ const Legend = styled.li`
   padding: 0;
 
   strong {
-    color: ${props => props.theme.colors.textColorDarker};
+    color: ${props => props.theme.text3};
     font-weight: 500;
     margin-right: 6px;
   }
 `
 const NoData = styled.div`
   align-items: center;
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.text3};
   display: flex;
   font-size: 15px;
   font-weight: 400;
@@ -81,6 +80,12 @@ const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentCol
   height: 8px;
   margin-right: 12px;
   width: 8px;
+`
+
+const AxisWrapper = styled.div`
+  display: inline;
+  stroke: ${props => props.theme.primary4};
+  fill: ${props => props.theme.text4};
 `
 
 const toPercent = (decimal: number, fixed = 0) => {
@@ -167,19 +172,21 @@ export const HistoryChart: React.FC<Props> = ({
       <ResponsiveWrapper>
         <ResponsiveContainer height={300} width="100%">
           <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
-            <XAxis
-              dataKey="date"
-              stroke={theme.colors.verticalDivider}
-              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
-              tickMargin={11}
-            />
-            <YAxis
-              orientation="right"
-              stroke={theme.colors.verticalDivider}
-              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
-              tickFormatter={isScalar ? toScaleValue : toPercent}
-              tickMargin={10}
-            />
+            <AxisWrapper>
+              <XAxis
+                dataKey="date"
+                stroke={'inherit'}
+                tick={{ fill: 'inherit', fontFamily: 'Roboto' }}
+                tickMargin={11}
+              />
+              <YAxis
+                orientation="right"
+                stroke={'inherit'}
+                tick={{ fill: 'inherit', fontFamily: 'Roboto' }}
+                tickFormatter={isScalar ? toScaleValue : toPercent}
+                tickMargin={10}
+              />
+            </AxisWrapper>
             <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
             {outcomes
