@@ -39,7 +39,7 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.div`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
 
   width: 100%;
   margin-bottom: auto;
@@ -54,7 +54,7 @@ const InputInfo = styled.div`
 `
 const WalletText = styled.div`
   margin-bottom: 14px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   line-height: 16.41px;
   letter-spacing: 0.2px;
 `
@@ -64,11 +64,11 @@ const DepositWithdrawButton = styled(Button)`
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
-  border-color: ${props => props.theme.buttonSecondary.color};
+  border-color: ${props => props.theme.primary4};
 
   margin-right: 16px;
   &:hover {
-    background-color: ${props => props.theme.colors.primaryLight};
+    background-color: ${props => props.theme.primary1};
   }
 `
 
@@ -78,7 +78,7 @@ const ExchangeDataItem = styled.div`
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
   letter-spacing: 0.2px;
-  color: ${props => props.theme.colors.textColorLightish};
+  color: ${props => props.theme.text2};
 `
 
 const BottomButtons = styled.div`
