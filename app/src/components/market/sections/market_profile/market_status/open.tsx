@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
+import { MarketBuyContainerV2 } from '../../../../../pages/MarkeBuyContainerV2'
 import { getNativeAsset, networkIds } from '../../../../../util/networks'
 import { getUnit, isDust } from '../../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
@@ -17,7 +18,6 @@ import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
 import { MarketBondContainer } from '../../market_bond/market_bond_container'
-import { MarketBuyContainer } from '../../market_buy/market_buy_container'
 import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
@@ -387,7 +387,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
-          <MarketBuyContainer
+          <MarketBuyContainerV2
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}

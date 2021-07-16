@@ -14,6 +14,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
 } from '../../../../hooks'
+import { SharedPropsInterface } from '../../../../pages/MarkeBuyContainerV2'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -60,10 +61,24 @@ interface Props {
   fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
+  sharedProps: SharedPropsInterface
 }
 
 export const ScalarMarketBuy = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, sharedProps, switchMarketTab } = props
+  const {
+    amount,
+    baseCost,
+    feePaid,
+    marketMaker,
+    outcomeIndex: positionIndex,
+    potentialProfit,
+    probabilitiesOrNewPrediction: newPrediction,
+    setAmount,
+    setOutcomeIndex: setPositionIndex,
+    sharesTotal,
+    tradedShares,
+  } = sharedProps
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
@@ -72,6 +87,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const {
     address: marketMakerAddress,
+
     balances,
     fee,
     outcomeTokenMarginalPrices,
@@ -79,15 +95,13 @@ export const ScalarMarketBuy = (props: Props) => {
     scalarHigh,
     scalarLow,
   } = marketMakerData
-  const { buildMarketMaker } = useContracts(context)
-  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const Tabs = {
     short: 'short',
     long: 'long',
   }
 
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  //const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
 
   const nativeAsset = getNativeAsset(networkId, relay)
@@ -95,7 +109,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
   const [activeTab, setActiveTab] = useState(Tabs.short)
-  const [positionIndex, setPositionIndex] = useState(0)
+  //const [positionIndex, setPositionIndex] = useState(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
@@ -161,40 +175,6 @@ export const ScalarMarketBuy = (props: Props) => {
     setUpgradeFinished(true)
   }
 
-  const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
-      let tradedShares: BigNumber
-
-      try {
-        tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
-      } catch {
-        tradedShares = new BigNumber(0)
-      }
-
-      const balanceAfterTrade = computeBalanceAfterTrade(
-        balances.map(b => b.holdings),
-        positionIndex,
-        amount,
-        tradedShares,
-      )
-      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-
-      const newPrediction = calcPrediction(
-        pricesAfterTrade[1].toString(),
-        scalarLow || new BigNumber(0),
-        scalarHigh || new BigNumber(0),
-      )
-
-      return [tradedShares, newPrediction, amount]
-    },
-    [balances, marketMaker, positionIndex, scalarLow, scalarHigh],
-  )
-  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
-    amount,
-    [new BigNumber(0), 0, amount],
-    calcBuyAmount,
-  )
-
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
@@ -203,11 +183,7 @@ export const ScalarMarketBuy = (props: Props) => {
       scalarHigh || new BigNumber(0),
     ) / 100
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
   const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
-
-  const baseCost = debouncedAmount.sub(feePaid)
-  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
 
@@ -224,8 +200,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const potentialLossFormatted = `${formatNumber(formatBigNumber(amount, collateral.decimals, collateral.decimals))} ${
     collateral.symbol
   }`
-
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
 
   const total = `${sharesTotal} Shares`
 
