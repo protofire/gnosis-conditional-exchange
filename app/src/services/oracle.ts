@@ -10,6 +10,8 @@ const logger = getLogger('Services::Oracle')
 
 const oracleAbi = [
   'function resolve(bytes32 questionId, uint256 templateId, string question, uint256 numOutcomes) external',
+  'function conditionalTokens() public view returns (address)',
+  'function realitio() public view returns (address)',
 ]
 
 export class OracleService {
@@ -50,6 +52,14 @@ export class OracleService {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
       throw err
     }
+  }
+
+  conditionalTokens = async () => {
+    return await this.contract.conditionalTokens()
+  }
+
+  realitio = async () => {
+    return await this.contract.realitio()
   }
 
   static encodeResolveCondition = (
