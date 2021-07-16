@@ -56,8 +56,8 @@ export const TRADING_FEE_OPTIONS = [
 export const GRAPH_MAINNET_HTTP =
   'https://gateway.thegraph.com/api/47e8db8d0f1b4a6c98b190e04f20dcb1/subgraphs/id/0x0503024fcc5e1bd834530e69d592dbb6e8c03968-0'
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
-export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
-export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kadenzipfel/omen-rinkeby' // TODO: Change back to protofire/omen-rinkeby
+export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/kadenzipfel/omen-rinkeby' // TODO: Change back to protofire/omen-rinkeby
 export const GRAPH_SOKOL_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_SOKOL_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_XDAI_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-xdai'

@@ -29,6 +29,12 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     [marketMakerFactoryAddress, provider, account],
   )
 
+  const marketMakerFactoryV2Address = getContractAddress(networkId, 'marketMakerFactoryV2')
+  const marketMakerFactoryV2 = useMemo(
+    () => new MarketMakerFactoryService(marketMakerFactoryV2Address, provider, account),
+    [marketMakerFactoryV2Address, provider, account],
+  )
+
   const realitioAddress = getContractAddress(networkId, 'realitio')
   const realitioScalarAdapterAddress = getContractAddress(networkId, 'realitioScalarAdapter')
   const realitio = useMemo(
@@ -69,13 +75,14 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     () => ({
       conditionalTokens,
       marketMakerFactory,
+      marketMakerFactoryV2,
       realitio,
       oracle,
       buildMarketMaker,
       kleros,
       dxTCR,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, dxTCR],
+    [conditionalTokens, marketMakerFactory, marketMakerFactoryV2, realitio, oracle, kleros, buildMarketMaker, dxTCR],
   )
 }
 

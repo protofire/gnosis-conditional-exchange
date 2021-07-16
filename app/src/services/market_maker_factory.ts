@@ -4,6 +4,7 @@ import { LogDescription } from 'ethers/utils/interface'
 
 import { MARKET_FEE } from '../common/constants'
 import { getLogger } from '../util/logger'
+import { getContractAddress } from '../util/networks'
 import { Log, Market, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -74,15 +75,28 @@ class MarketMakerFactoryService {
     conditionId: string,
     signerAddress: string,
     spread: number,
+    networkId: number,
   ): Promise<string> => {
     const feeBN = ethers.utils.parseEther('' + spread / Math.pow(10, 2))
     const cloneFactoryInterface = new utils.Interface(['function cloneConstructor(bytes consData) external'])
-    const cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
-      utils.defaultAbiCoder.encode(
-        ['address', 'address', 'bytes32[]', 'uint'],
-        [conditionalTokenAddress, collateralAddress, [conditionId], feeBN],
-      ),
-    ])
+    let cloneConstructorEncodedCall
+    const v2 = getContractAddress(networkId, 'marketMakerFactoryV2')
+
+    if (this.contract.address.toLowerCase() === v2.toLowerCase()) {
+      cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
+        utils.defaultAbiCoder.encode(
+          ['address', 'address', 'bytes32[]', 'uint', 'address'],
+          [conditionalTokenAddress, collateralAddress, [conditionId], feeBN, v2],
+        ),
+      ])
+    } else {
+      cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
+        utils.defaultAbiCoder.encode(
+          ['address', 'address', 'bytes32[]', 'uint'],
+          [conditionalTokenAddress, collateralAddress, [conditionId], feeBN],
+        ),
+      ])
+    }
 
     const implementationMaster = await this.contract.implementationMaster()
 

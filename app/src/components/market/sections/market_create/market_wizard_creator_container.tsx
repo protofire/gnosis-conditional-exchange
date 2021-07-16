@@ -22,7 +22,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
+  const { conditionalTokens, marketMakerFactoryV2, realitio } = useContracts(context)
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -92,7 +92,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory,
+            marketMakerFactory: marketMakerFactoryV2,
             useCompoundReserve,
             setTxHash,
             setTxState,
@@ -121,7 +121,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory,
+            marketMakerFactory: marketMakerFactoryV2,
             setTxHash,
             setTxState,
             useCompoundReserve,

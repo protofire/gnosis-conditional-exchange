@@ -62,6 +62,7 @@ interface Network {
     realitio: string
     realitioScalarAdapter: string
     marketMakerFactory: string
+    marketMakerFactoryV2: string
     conditionalTokens: string
     oracle: string
     klerosBadge: string
@@ -117,6 +118,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
+      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
@@ -163,6 +165,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      marketMakerFactoryV2: '0x9dd6eB146D7fb98614487617DE608560321E15BE',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -209,6 +212,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
       realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
+      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
       oracle: '0x9E6bd63aEbFb2E858B6111cea9C389f7664F7108',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -258,6 +262,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57',
       realitioScalarAdapter: '0xcA75aaC320089c9fb077E86857fF6e954Df06a6B',
       marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
+      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
       conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
       oracle: '0xAB16D643bA051C11962DA645f74632d3130c81E2',
       klerosBadge: '0x0000000000000000000000000000000000000000',
