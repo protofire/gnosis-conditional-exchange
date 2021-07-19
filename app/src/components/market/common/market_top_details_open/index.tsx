@@ -73,7 +73,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const currentTimestamp = new Date().getTime()
 
-  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
+  const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

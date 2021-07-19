@@ -10,10 +10,10 @@ import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
+  bigNumberToNumber,
+  bigNumberToString,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
-  formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   mulBN,
 } from '../../../../util/tools'
@@ -70,7 +70,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
-    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    const shares = bigNumberToNumber(balances[i].shares, collateral.decimals)
     if (shares > 0) {
       defaultOutcomeIndex = i
       break
@@ -90,10 +90,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+  const marketFeeWithTwoDecimals = bigNumberToNumber(fee, STANDARD_DECIMALS)
 
   useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountShares(bigNumberToNumber(amountShares || Zero, collateral.decimals) < 0)
   }, [amountShares, collateral.decimals])
 
   useEffect(() => {
@@ -169,10 +169,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
+      const sharesAmount = bigNumberToString(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Selling ${sharesAmount} shares...`)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -189,7 +189,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully sold ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -204,9 +204,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
   )
 
-  const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
-  )
+  const selectedOutcomeBalance = bigNumberToString(balanceItem.shares, collateral.decimals)
 
   const amountError = isTransactionProcessing
     ? null
@@ -223,7 +221,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setDisplaySellShares(shares)
   }
 
-  const sellAmountSharesDisplay = formatBigNumber(amountShares || Zero, collateral.decimals)
+  const sellAmountSharesDisplay = bigNumberToString(amountShares || Zero, collateral.decimals)
 
   const isSellButtonDisabled =
     !amountShares ||
@@ -273,7 +271,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesToDisplay(bigNumberToString(balanceItem.shares, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -282,14 +280,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         </div>
         <div>
           <TransactionDetailsCard>
-            <TransactionDetailsRow title={'Sell Amount'} value={`${formatNumber(sellAmountSharesDisplay)} Shares`} />
+            <TransactionDetailsRow title={'Sell Amount'} value={`${sellAmountSharesDisplay} Shares`} />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
               state={ValueStates.success}
               title={'Profit'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, collateral.decimals))} 
+                  ? `${bigNumberToString(potentialValue, collateral.decimals)} 
                   ${collateral.symbol}`
                   : '0.00'
               }
@@ -297,28 +295,24 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               title={'Trading Fee'}
               value={`${
-                costFee
-                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, collateral.decimals))
-                  : '0.00'
+                costFee ? bigNumberToString(costFee.mul(-1), collateral.decimals, collateral.decimals) : '0.00'
               } ${collateral.symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               emphasizeValue={
-                (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) || false
+                (tradedCollateral && bigNumberToNumber(tradedCollateral, collateral.decimals) > 0) || false
               }
               state={
                 (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                  bigNumberToNumber(tradedCollateral, collateral.decimals) > 0 &&
                   ValueStates.important) ||
                 ValueStates.normal
               }
               title={'Total'}
-              value={`${
-                tradedCollateral
-                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, collateral.decimals))
-                  : '0.00'
-              } ${collateral.symbol}`}
+              value={`${tradedCollateral ? bigNumberToNumber(tradedCollateral, collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
           </TransactionDetailsCard>
         </div>

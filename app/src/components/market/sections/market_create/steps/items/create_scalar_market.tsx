@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
-import { formatBigNumber } from '../../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
@@ -135,25 +135,25 @@ export const CreateScalarMarket = (props: Props) => {
         ? setLowerBoundError('Value cannot be negative')
         : (upperBound?.gt(Zero) && lowerBound?.gt(upperBound)) ||
           (lowerBound && upperBound?.gt(Zero) && upperBound?.eq(lowerBound))
-        ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        ? setLowerBoundError(`Value must be less than ${bigNumberToNumber(upperBound, STANDARD_DECIMALS)}`)
         : (startingPoint?.gt(Zero) && lowerBound?.gt(startingPoint)) ||
           (lowerBound && startingPoint?.gt(Zero) && startingPoint?.eq(lowerBound))
-        ? setLowerBoundError(`Value must be less than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        ? setLowerBoundError(`Value must be less than ${bigNumberToNumber(startingPoint, STANDARD_DECIMALS)}`)
         : setLowerBoundError('')
     }
     if (startingPointFocus) {
       ;(lowerBound && startingPoint?.eq(lowerBound)) || (lowerBound && startingPoint?.lt(lowerBound))
-        ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        ? setStartingPointError(`Value must be greater than ${bigNumberToNumber(lowerBound, STANDARD_DECIMALS)}`)
         : (upperBound?.gt(Zero) && startingPoint?.gt(upperBound)) ||
           (upperBound?.gt(Zero) && startingPoint?.eq(upperBound))
-        ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        ? setStartingPointError(`Value must be less than ${bigNumberToNumber(upperBound, STANDARD_DECIMALS)}`)
         : setStartingPointError('')
     }
     if (upperBoundFocus) {
       ;(lowerBound && upperBound?.eq(lowerBound)) || (lowerBound && upperBound?.lt(lowerBound))
-        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        ? setUpperBoundError(`Value must be greater than ${bigNumberToNumber(lowerBound, STANDARD_DECIMALS)}`)
         : (startingPoint && upperBound?.eq(startingPoint)) || (startingPoint && upperBound?.lt(startingPoint))
-        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        ? setUpperBoundError(`Value must be greater than ${bigNumberToNumber(startingPoint, STANDARD_DECIMALS)}`)
         : setUpperBoundError('')
     }
   }, [lowerBound, upperBound, startingPoint, lowerBoundFocus, upperBoundFocus, startingPointFocus])

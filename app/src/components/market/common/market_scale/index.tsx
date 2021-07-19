@@ -7,9 +7,10 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { getNativeAsset } from '../../../../util/networks'
 import {
+  bigNumberToNumber,
+  bigNumberToString,
   calcPrediction,
   calcXValue,
-  formatBigNumber,
   formatNumber,
   getInitialCollateral,
   isDust,
@@ -287,21 +288,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const { decimals: NativeDecimals, symbol: NativeSymbol } = getNativeAsset(networkId, relay)
 
   const collateral = props.collateral ? getInitialCollateral(networkId, props.collateral, relay) : null
-  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
-  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
-  const startingPointNumber =
-    startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS))
+  const lowerBoundNumber = lowerBound && bigNumberToNumber(lowerBound, STANDARD_DECIMALS)
+  const upperBoundNumber = upperBound && bigNumberToNumber(upperBound, STANDARD_DECIMALS)
+
+  const startingPointNumber = startingPoint && bigNumberToNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS)
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
   const marketPredictionNumber = calcPrediction(outcomePredictedByMarket || '', lowerBound, upperBound)
 
-  const amountSharesNumber =
-    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals, collateral.decimals))
+  const amountSharesNumber = collateral && bigNumberToNumber(amountShares || new BigNumber(0), collateral.decimals)
 
-  const tradeAmountNumber =
-    collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals, collateral.decimals))
-  const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
+  const tradeAmountNumber = collateral && bigNumberToNumber(tradeAmount || new BigNumber(0), collateral.decimals)
+  const feeNumber = fee && collateral && bigNumberToNumber(fee, collateral.decimals)
 
   const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
   const shortShares =
@@ -315,10 +314,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.length &&
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
-  const shortSharesNumber =
-    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals))
-  const longSharesNumber =
-    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals))
+  const shortSharesNumber = collateral && bigNumberToNumber(shortShares || new BigNumber(0), collateral.decimals)
+  const longSharesNumber = collateral && bigNumberToNumber(longShares || new BigNumber(0), collateral.decimals)
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -468,13 +465,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        const totalShortPriceNumber = bigNumberToNumber(totalShortPrice, collateral.decimals)
         setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
         setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
         setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        const totalLongPriceNumber = bigNumberToNumber(totalLongPrice, collateral.decimals)
         setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
 
         setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
@@ -566,16 +563,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title: currentAnswerBond
-        ? `${formatNumber(formatBigNumber(currentAnswerBond, NativeDecimals))}  ${NativeSymbol}`
-        : '-',
+      title: currentAnswerBond ? `${bigNumberToString(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
       subtitle: 'Bonded',
     },
     {
       title: currentAnswer
         ? currentAnswer === INVALID_ANSWER_ID
           ? 'Invalid'
-          : `${formatNumber(formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS))} ${unit}`
+          : `${bigNumberToString(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
         : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },

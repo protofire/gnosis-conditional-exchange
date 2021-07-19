@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust, reverseArray } from '../../../../util/tools'
+import { bigNumberToString, isDust, reverseArray } from '../../../../util/tools'
 import { BalanceItem } from '../../../../util/types'
 import { RadioInput } from '../../../common'
 
@@ -77,9 +77,7 @@ export const PositionSelectionBox = (props: Props) => {
           />
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>
-        <PositionSelectionAmount>
-          {formatNumber(formatBigNumber(balance.shares, decimals))} Shares
-        </PositionSelectionAmount>
+        <PositionSelectionAmount>{bigNumberToString(balance.shares, decimals)} Shares</PositionSelectionAmount>
       </PositionSelectionBoxItem>
     )
   }

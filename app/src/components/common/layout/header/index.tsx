@@ -8,7 +8,7 @@ import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
-import { formatBigNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonRound } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -320,8 +320,8 @@ const HeaderContainer: React.FC = (props: any) => {
           {account && (
             <HeaderButton style={{ display: 'none' }}>
               {relay
-                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+                ? `${bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${bigNumberToString(omenBalance, STANDARD_DECIMALS, 0)}`}
               <OmenIconWrapper>
                 <IconOmen size={24} />
               </OmenIconWrapper>

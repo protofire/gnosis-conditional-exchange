@@ -9,7 +9,7 @@ import { useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../../
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { bigNumberToString, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -124,13 +124,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatNumber(
-                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
-              )} ${getUnit(props.marketMakerData.question.title)}`
+            ? `${bigNumberToString(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
-        } with ${formatNumber(
-          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
-        )} ${symbol}`,
+        } with ${bigNumberToString(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`,
       )
 
       setTxState(TransactionStep.waitingConfirmation)
@@ -152,15 +150,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       setBondOutcomeDisplay('0')
       setBondOutcomeSelected(Zero)
       setMessage(
-        `Successfully bonded ${formatNumber(
-          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
-        )} ${symbol} on ${
+        `Successfully bonded ${bigNumberToString(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol} on ${
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatNumber(
-                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
-              )} ${getUnit(props.marketMakerData.question.title)}`
+            ? `${bigNumberToString(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
@@ -230,7 +226,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <CurrenciesWrapper>
               <AssetBalance
                 asset={nativeAsset}
-                value={`${formatNumber(formatBigNumber(nativeAssetBalance, nativeAsset.decimals, 3), 3)}`}
+                value={`${bigNumberToString(nativeAssetBalance, nativeAsset.decimals, 3)}`}
               />
             </CurrenciesWrapper>
 
@@ -276,21 +272,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals))} ${symbol}`}
+              value={`${bigNumberToString(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(
-                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
-              )} ${symbol}`}
+              value={`${bigNumberToString(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS)} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
+              value={`${bigNumberToString(bondNativeAssetAmount, STANDARD_DECIMALS)} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>

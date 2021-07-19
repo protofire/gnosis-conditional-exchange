@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { getTxHashBlockExplorerURL } from '../../../../util/networks'
-import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
+import { bigNumberToString, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { ButtonRound } from '../../../button'
 import { IconJazz } from '../../../common/icons/IconJazz'
 import { InlineLoading } from '../../../loading/inline_loading'
@@ -139,9 +139,9 @@ export const HistoryTable: React.FC<Props> = ({
                     <Address>{formatHistoryUser(user.id)}</Address>
                   </HistoryColumns>
                   <HistoryColumns>{transactionType}</HistoryColumns>
-                  <HistoryColumns>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryColumns>
+                  <HistoryColumns>{bigNumberToString(sharesOrPoolTokenAmount, decimals, 3)}</HistoryColumns>
                   <HistoryColumns>
-                    {formatBigNumber(collateralTokenAmount, decimals, 3)}
+                    {bigNumberToString(collateralTokenAmount, decimals, 3)}
                     {` ${formattedCurrency}`}
                   </HistoryColumns>
                   <HistoryColumns as="a" href={getTxHashBlockExplorerURL(networkId, transactionHash)} target="_blank">

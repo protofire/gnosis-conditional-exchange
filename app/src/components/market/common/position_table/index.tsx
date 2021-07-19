@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { bigNumberToString, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
 import { TD, THead, TR, Table } from '../../../common'
 import {
@@ -55,12 +55,8 @@ export const PositionTable = (props: Props) => {
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesFormatted = formatNumber(
-    formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals),
-  )
-  const longSharesFormatted = formatNumber(
-    formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals),
-  )
+  const shortSharesFormatted = bigNumberToString(shortShares || new BigNumber(0), collateral.decimals)
+  const longSharesFormatted = bigNumberToString(longShares || new BigNumber(0), collateral.decimals)
 
   const isShortPositive = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
   const isLongPositive = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined

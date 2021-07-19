@@ -17,11 +17,11 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToNumber,
+  bigNumberToString,
   calcAddFundingSendAmounts,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
-  formatBigNumber,
-  formatNumber,
   getInitialCollateral,
 } from '../../../../util/tools'
 import {
@@ -115,11 +115,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToFund(bigNumberToNumber(amountToFund || Zero, collateral.decimals) < 0)
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToRemove(bigNumberToNumber(amountToRemove || Zero, collateral.decimals) < 0)
   }, [amountToRemove, collateral.decimals])
 
   useEffect(() => {
@@ -136,7 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
+  const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -185,8 +185,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+  const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
+  const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -212,9 +212,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
-      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(amountToFund || Zero, collateral.decimals)
 
-      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -235,7 +235,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -251,9 +251,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
 
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
 
@@ -278,7 +278,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -419,7 +419,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+                  setAmountToFundDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
@@ -430,7 +430,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
                 formField={
@@ -448,7 +448,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(fundingBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton
                 symbol=""
@@ -472,7 +472,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, collateral.decimals))}`}
+                value={`${bigNumberToString(poolTokens, collateral.decimals)}`}
               />
             </TransactionDetailsCard>
           )}
@@ -482,25 +482,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${bigNumberToString(userEarnings, collateral.decimals)} ${collateral.symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${bigNumberToString(depositedTokens, collateral.decimals)} ${collateral.symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(
-                  formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals),
-                )} ${collateral.symbol}`}
+                value={`${bigNumberToString(depositedTokensTotal, collateral.decimals)} ${collateral.symbol}`}
               />
             </TransactionDetailsCard>
           )}

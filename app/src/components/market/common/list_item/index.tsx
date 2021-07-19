@@ -8,9 +8,9 @@ import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import {
+  bigNumberToNumber,
   calcPrediction,
   calcPrice,
-  formatBigNumber,
   formatNumber,
   formatToShortNumber,
   getScalarTitle,
@@ -110,13 +110,14 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   let token: Token | undefined
   try {
     const tokenInfo = getTokenFromAddress(context.networkId, collateralToken)
-    const volume = formatBigNumber(collateralVolume, tokenInfo.decimals)
+    const volume = bigNumberToNumber(collateralVolume, tokenInfo.decimals)
+
     token = { ...tokenInfo, volume }
   } catch (err) {
     logger.debug(err.message)
   }
 
-  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
+  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: 0 })
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -127,7 +128,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
-  const formattedLiquidity: string = scaledLiquidityParameter.toFixed(2)
+  const formattedLiquidity: number = scaledLiquidityParameter
 
   useEffect(() => {
     const setToken = async () => {
@@ -135,7 +136,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         // fallback to token service if unknown token
         const erc20Service = new ERC20Service(provider, account, collateralToken)
         const { decimals, symbol } = await erc20Service.getProfileSummary()
-        const volume = formatBigNumber(collateralVolume, decimals)
+        const volume = bigNumberToNumber(collateralVolume, decimals)
 
         setDetails({ symbol, decimals, volume })
       }
@@ -176,14 +177,17 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'usdVolume' && `${formatToShortNumber(volume || '')} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'usdVolume' && `${formatToShortNumber(volume || 0)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' &&
             `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${
               Math.floor(Date.now() / 86400000) === lastActiveDay && runningDailyVolumeByHour && decimals
                 ? formatToShortNumber(
-                    formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals),
+                    bigNumberToNumber(
+                      runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24],
+                      decimals,
+                    ),
                   )
                 : 0
             } ${symbol} - 24h Volume`}

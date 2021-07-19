@@ -8,6 +8,8 @@ import { Token } from '../types'
 import {
   bigMax,
   bigMin,
+  bigNumberToNumber,
+  bigNumberToString,
   calcXValue,
   clampBigNumber,
   formatHistoryDate,
@@ -119,6 +121,37 @@ describe('tools', () => {
       })
     }
   })
+  describe('bigNumberToString', () => {
+    const testCases: [[string, number, number], string][] = [
+      [['14300', 18, 3], '14,300.000'],
+      [['0.001', 18, 2], '<0.01'],
+      [['333', 18, 1], '333.0'],
+    ]
+
+    for (const [values, expected] of testCases) {
+      it(`should return string representation of BigNumber`, () => {
+        const constructBigNumber = parseUnits(values[0], values[1])
+        const result = bigNumberToString(constructBigNumber, values[1], values[2])
+        expect(result).toEqual(expected)
+      })
+    }
+  })
+  describe('bigNumberToNumber', () => {
+    const testCases: [[string, number], number][] = [
+      [['143', 18], 143],
+      [['222', 8], 222],
+      [['333', 18], 333],
+    ]
+
+    for (const [values, expected] of testCases) {
+      it(`should return number representation of BigNumber`, () => {
+        const constructBigNumber = parseUnits(values[0], values[1])
+        const result = bigNumberToNumber(constructBigNumber, values[1])
+
+        expect(result).toEqual(expected)
+      })
+    }
+  })
 
   describe('formatHistoryDate', () => {
     const testCases: [number, string][] = [
@@ -175,11 +208,11 @@ describe('tools', () => {
   })
 
   describe('formatToShortNumber', () => {
-    const testCases: [[string, number], string][] = [
-      [['1234567.8910', 2], '1.23M'],
-      [['0', 8], '0'],
-      [['4269.123123222334', 0], '4K'],
-      [['20100', 2], '20.1K'],
+    const testCases: [[number, number], string][] = [
+      [[1234567.891, 2], '1.23M'],
+      [[0, 8], '0'],
+      [[4269.123123222334, 0], '4K'],
+      [[20100, 2], '20.1K'],
     ]
     for (const [[number, decimals], result] of testCases) {
       it('should return the correct numerical string', () => {

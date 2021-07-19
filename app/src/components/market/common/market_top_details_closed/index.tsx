@@ -70,7 +70,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
+  const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

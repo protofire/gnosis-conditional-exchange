@@ -11,7 +11,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { ERC20Service, RealitioService } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
-import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
+import { bigNumberToNumber, bigNumberToString, getUnit, isDust } from '../../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -383,9 +383,9 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
-  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
-  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
+  const realitioAnswerNumber = bigNumberToNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS)
+  const scalarLowNumber = bigNumberToNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS)
+  const scalarHighNumber = bigNumberToNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS)
 
   const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
@@ -441,13 +441,13 @@ const Wrapper = (props: Props) => {
   let redeemString = 'NaN'
   let balanceString = ''
   if (earnedCollateral) {
-    redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
+    redeemString = `${bigNumberToString(earnedCollateral, collateralToken.decimals)} ${symbol}`
   }
   const nativeAsset = getNativeAsset(networkId, relay)
   if (userRealitioWithdraw) {
-    balanceString = `${formatBigNumber(userRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+    balanceString = `${bigNumberToString(userRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   } else if (cpkRealitioWithdraw) {
-    balanceString = `${formatBigNumber(cpkRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+    balanceString = `${bigNumberToString(cpkRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   }
 
   return (

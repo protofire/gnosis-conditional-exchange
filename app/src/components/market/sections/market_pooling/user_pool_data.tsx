@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
-import { formatBigNumber, formatNumber, getInitialCollateral } from '../../../../util/tools'
+import { bigNumberToString, getInitialCollateral } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'
@@ -71,27 +71,25 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     <UserData>
       <UserDataTitleValue
         title="Your Liquidity"
-        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals, collateral.decimals))} ${
-          collateral.symbol
-        }`}
+        value={`${bigNumberToString(totalUserLiquidity, collateral.decimals)} ${collateral.symbol}`}
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals, collateral.decimals))}`}
+        value={`${bigNumberToString(totalPoolShares, collateral.decimals)}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
-        value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(userEarnings, collateral.decimals, collateral.decimals),
-        )} ${collateral.symbol}`}
+        value={`${userEarnings.gt(0) ? '+' : ''}${bigNumberToString(userEarnings, collateral.decimals)} ${
+          collateral.symbol
+        }`}
       />
       <UserDataTitleValue
         state={totalEarnings.gt(0) ? ValueStates.success : undefined}
         title="Total Earnings"
-        value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(totalEarnings, collateral.decimals, collateral.decimals),
-        )} ${collateral.symbol}`}
+        value={`${totalEarnings.gt(0) ? '+' : ''}${bigNumberToString(totalEarnings, collateral.decimals)} ${
+          collateral.symbol
+        }`}
       />
     </UserData>
   )

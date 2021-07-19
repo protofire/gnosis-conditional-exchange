@@ -50,7 +50,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   state?: ValueStates
   tooltip?: string
   title: string
-  value: any
+  value: string
 }
 
 export const TransactionDetailsRow: React.FC<Props> = props => {

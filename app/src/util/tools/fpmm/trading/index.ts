@@ -4,7 +4,7 @@ import { WeiPerEther, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { formatBigNumber } from '../../formatting'
+import { bigNumberToNumber } from '../../formatting'
 import { ceilDiv, divBN, mulBN } from '../../maths'
 
 /**
@@ -133,17 +133,17 @@ export const calcSellAmountInCollateral = (
 }
 
 export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
-  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, STANDARD_DECIMALS))
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
+  const currentPredictionNumber = bigNumberToNumber(currentPrediction, STANDARD_DECIMALS)
+  const lowerBoundNumber = bigNumberToNumber(lowerBound, STANDARD_DECIMALS)
+  const upperBoundNumber = bigNumberToNumber(upperBound, STANDARD_DECIMALS)
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
   return xValue > 100 ? 100 : xValue < 0 ? 0 : xValue
 }
 
 export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
   const probabilityNumber = Number(probability)
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+  const lowerBoundNumber = bigNumberToNumber(lowerBound, STANDARD_DECIMALS)
+  const upperBoundNumber = bigNumberToNumber(upperBound, STANDARD_DECIMALS)
   const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   return prediction
 }

@@ -138,7 +138,7 @@ export interface Token {
   decimals: number
   symbol: string
   image?: string
-  volume?: string
+  volume?: number
   balance?: string
   name?: string
   allowance?: string

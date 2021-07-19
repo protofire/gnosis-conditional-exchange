@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Spinner } from '../../../common/spinner'
@@ -105,7 +105,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         secondaryText: !tokenBalance
           ? ''
           : Number(tokenBalance) > 0
-          ? formatBigNumber(new BigNumber(tokenBalance), decimals, 5)
+          ? bigNumberToString(new BigNumber(tokenBalance), decimals, 5)
           : '0',
         onClick: () => {
           if (!disabled) onChange(address)

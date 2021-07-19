@@ -13,7 +13,7 @@ import {
 import { realitioAbi } from '../../../../services/realitio'
 import { SafeService } from '../../../../services/safe'
 import { getContractAddress } from '../../../../util/networks'
-import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
+import { bigNumberToNumber, calcPrice, calcSellAmountInCollateral, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
@@ -135,7 +135,7 @@ export const History_select: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+  const marketFeeWithTwoDecimals = bigNumberToNumber(fee, STANDARD_DECIMALS)
   const { fpmmTransactions, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
@@ -231,7 +231,7 @@ export const History_select: React.FC<Props> = ({
               if (
                 Number(item.additionalSharesCost) !== 0 &&
                 sharesValue &&
-                formatBigNumber(sharesValue, item.decimals, 3) !== '0.000'
+                bigNumberToNumber(sharesValue, item.decimals) !== 0
               ) {
                 newFpmmTradeArray.push({
                   sharesOrPoolTokenAmount: item.additionalSharesCost,

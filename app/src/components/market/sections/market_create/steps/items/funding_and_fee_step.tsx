@@ -17,7 +17,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
-import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
+import { bigNumberToNumber, bigNumberToString, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -252,7 +252,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals, 5),
+    bigNumberToString(collateralBalance, collateral.decimals, 5),
   )
   const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
 
@@ -260,12 +260,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
+    setCollateralBalanceFormatted(bigNumberToString(maybeCollateralBalance || Zero, collateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
   useEffect(() => {
-    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
+    setIsNegativeDepositAmount(bigNumberToNumber(funding, collateral.decimals) < 0)
   }, [funding, collateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution, false)
@@ -281,7 +281,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${formattedAmount} ${collateral.symbol}`
       : null
 
   const isCreateMarketbuttonDisabled =
@@ -338,7 +338,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     // optimistically update collateral balance
     const newCollateralBalance = new BigNumber(token.balance)
     setCollateralBalance(newCollateralBalance)
-    setCollateralBalanceFormatted(formatBigNumber(newCollateralBalance, token.decimals, 5))
+    setCollateralBalanceFormatted(bigNumberToString(newCollateralBalance, token.decimals, 5))
 
     const newAmount = ethers.utils.parseUnits(Number(formattedAmount).toFixed(token.decimals), token.decimals)
 
@@ -373,7 +373,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
-    const formatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+    const formatted = bigNumberToString(collateralBalance, collateral.decimals, 5, true)
     setAmountToDisplay(formatted)
     setFormattedAmount(formatted)
   }
@@ -458,7 +458,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <CurrencySelector
                 addBalances
                 addNativeAsset
-                balance={formatNumber(collateralBalanceFormatted, 5)}
+                balance={collateralBalanceFormatted}
                 context={context}
                 currency={collateral.address}
                 onSelect={onCollateralChange}
@@ -499,10 +499,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
               <TransactionDetailsLine />
-              <TransactionDetailsRow
-                title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, collateral.decimals, collateral.decimals))}
-              />
+              <TransactionDetailsRow title={'Pool Tokens'} value={bigNumberToString(funding, collateral.decimals)} />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsWrapper>
