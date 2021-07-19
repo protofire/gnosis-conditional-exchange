@@ -67,7 +67,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
-  const { cpk, library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
@@ -101,8 +101,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [tweet, setTweet] = useState('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
 
@@ -272,8 +270,6 @@ export const ScalarMarketBuy = (props: Props) => {
         collateral,
         outcomeIndex,
         marketMaker,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketUserTxData()

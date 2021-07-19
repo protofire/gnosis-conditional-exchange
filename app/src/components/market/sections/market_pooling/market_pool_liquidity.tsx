@@ -83,7 +83,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const { fetchBalances } = context.balances
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
@@ -107,8 +107,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -224,8 +222,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         amount: amountToFund || Zero,
         collateral,
         marketMaker,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -267,8 +263,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
-        setTxHash,
-        setTxState,
         sharesToBurn: amountToRemove || Zero,
       })
       await fetchGraphMarketMakerData()

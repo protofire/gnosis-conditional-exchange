@@ -86,10 +86,10 @@ export const exec = async (params: ExecParams) => {
   }
 
   const txObject = await service.cpk.execTransactions(transactions, txOptions)
-  setTxState && setTxState(TransactionStep.transactionSubmitted)
-  setTxHash && setTxHash(txObject.hash)
+  setTxState(TransactionStep.transactionSubmitted)
+  setTxHash(txObject.hash)
   const transaction = await service.waitForTransaction(txObject)
-  setTxState && setTxState(TransactionStep.transactionConfirmed)
+  setTxState(TransactionStep.transactionConfirmed)
   return { ...params, transaction }
 }
 

@@ -2,6 +2,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
+import { ConnectedWeb3Context } from '../../hooks'
 import { Transaction, verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
@@ -56,8 +57,6 @@ interface CPKBuyOutcomesParams {
   collateral: Token
   outcomeIndex: number
   marketMaker: MarketMakerService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSellOutcomesParams {
@@ -65,8 +64,6 @@ interface CPKSellOutcomesParams {
   outcomeIndex: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKCreateMarketParams {
@@ -74,16 +71,12 @@ interface CPKCreateMarketParams {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKAddFundingParams {
   amount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKRemoveFundingParams {
@@ -93,8 +86,6 @@ interface CPKRemoveFundingParams {
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
   sharesToBurn: BigNumber
 }
 
@@ -112,8 +103,6 @@ interface CPKRedeemParams {
   realitioBalance: BigNumber
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKResolveParams {
@@ -124,8 +113,6 @@ interface CPKResolveParams {
   numOutcomes: number
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSubmitAnswerParams {
@@ -133,8 +120,6 @@ interface CPKSubmitAnswerParams {
   question: Question
   answer: string
   amount: BigNumber
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 interface TransactionResult {
@@ -145,11 +130,6 @@ interface TransactionResult {
 export interface TxOptions {
   value?: BigNumber
   gas?: number
-}
-
-interface TxState {
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
 }
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
@@ -172,12 +152,14 @@ class CPKService {
   provider: Web3Provider
   safe: SafeService
   relayService: RelayService
+  context?: ConnectedWeb3Context
 
-  constructor(cpk: any, provider: Web3Provider) {
+  constructor(cpk: any, provider: Web3Provider, context?: ConnectedWeb3Context) {
     this.cpk = cpk
     this.provider = provider
     this.safe = new SafeService(cpk.address, provider)
     this.relayService = new RelayService()
+    this.context = context
   }
 
   get address(): string {
@@ -240,12 +222,7 @@ class CPKService {
     return transactionReceipt
   }
 
-  execTransactions = async (
-    transactions: Transaction[],
-    txOptions?: TxOptions,
-    setTxHash?: (arg0: string) => void,
-    setTxState?: (step: TransactionStep) => void,
-  ) => {
+  execTransactions = async (transactions: Transaction[], txOptions?: TxOptions) => {
     if (this.cpk.relay) {
       const { address, fee } = await this.relayService.getInfo()
       transactions.push({
@@ -255,10 +232,10 @@ class CPKService {
     }
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
-    setTxState && setTxState(TransactionStep.transactionSubmitted)
-    setTxHash && setTxHash(txObject.hash)
+    this.context?.setTxState(TransactionStep.transactionSubmitted)
+    this.context?.setTxHash(txObject.hash)
     const tx = await this.waitForTransaction(txObject)
-    setTxState && setTxState(TransactionStep.transactionConfirmed)
+    this.context?.setTxState(TransactionStep.transactionConfirmed)
     return tx
   }
 
@@ -276,7 +253,12 @@ class CPKService {
     return amount
   }
 
-  pipe = (...fns: any) => (params: any) => pipe(setup, ...fns, exec)({ ...params, service: this })
+  pipe = (...fns: any) => (params: any) =>
+    pipe(
+      setup,
+      ...fns,
+      exec,
+    )({ ...params, service: this, setTxHash: this.context?.setTxHash, setTxState: this.context?.setTxState })
 
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -396,7 +378,7 @@ class CPKService {
     }
   }
 
-  submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
+  submitAnswer = async ({ amount, answer, question, realitio }: CPKSubmitAnswerParams) => {
     try {
       const txOptions: TxOptions = {}
       if (!this.isSafeApp) {
@@ -410,7 +392,7 @@ class CPKService {
         },
       ]
       await this.getGas(txOptions)
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      return this.execTransactions(transactions, txOptions)
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error
@@ -493,12 +475,7 @@ class CPKService {
     }
   }
 
-  sendXdaiChainTokenToBridge = async (
-    amount: BigNumber,
-    address: string,
-    { setTxHash, setTxState }: TxState,
-    symbol?: string,
-  ) => {
+  sendXdaiChainTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
@@ -515,14 +492,14 @@ class CPKService {
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions)
           return transactionHash
         } else {
           transactions.push({
             to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions)
 
           return transactionHash
         }

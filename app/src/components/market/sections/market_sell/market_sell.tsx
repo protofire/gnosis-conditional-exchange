@@ -57,7 +57,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { cpk, networkId, relay } = context
+  const { cpk, networkId, relay, setTxState, txHash, txState } = context
   const { fetchBalances } = context.balances
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
@@ -87,8 +87,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
 
@@ -179,8 +177,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         outcomeIndex,
         marketMaker,
         conditionalTokens,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()

@@ -110,16 +110,13 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
-  const cpk = context.cpk
+  const { cpk, setTxHash, setTxState, txHash, txState } = context
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -219,15 +216,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       const hash =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
-          : await cpk.sendXdaiChainTokenToBridge(
-              displayFundAmount,
-              address,
-              {
-                setTxState,
-                setTxHash,
-              },
-              symbol,
-            )
+          : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, address, symbol)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
 

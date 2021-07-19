@@ -179,11 +179,9 @@ export const ModalYourConnection = (props: Props) => {
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
 
-  const { cpk, relay } = context
+  const { cpk, relay, setTxHash, setTxState, txHash, txState } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')

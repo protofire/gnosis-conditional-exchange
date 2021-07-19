@@ -69,6 +69,7 @@ export const ScalarMarketSell = (props: Props) => {
   } = marketMakerData
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  const { networkId, setTxState, txHash, txState } = context
 
   const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
@@ -78,13 +79,10 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-  const { networkId } = context
   const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
@@ -187,8 +185,6 @@ export const ScalarMarketSell = (props: Props) => {
         conditionalTokens,
         marketMaker,
         outcomeIndex,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketUserTxData()

@@ -75,7 +75,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
-  const { cpk, library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -106,8 +106,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
@@ -201,8 +199,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         collateral,
         marketMaker,
         outcomeIndex,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()

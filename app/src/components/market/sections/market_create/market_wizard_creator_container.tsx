@@ -17,7 +17,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
-  const { account, cpk, library: provider } = context
+  const { account, cpk, library: provider, setTxState, txHash, txState } = context
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
@@ -27,8 +27,6 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
   const [message, setMessage] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
@@ -62,8 +60,6 @@ const MarketWizardCreatorContainer: FC = () => {
             conditionalTokens,
             realitio,
             marketMakerFactory,
-            setTxHash,
-            setTxState,
           })
           await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
@@ -76,8 +72,6 @@ const MarketWizardCreatorContainer: FC = () => {
             conditionalTokens,
             realitio,
             marketMakerFactory,
-            setTxHash,
-            setTxState,
           })
           await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
